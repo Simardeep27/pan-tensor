@@ -12,7 +12,7 @@ import os
 import pdb
 import matplotlib.pyplot as plt
 
-ctw_root_dir = './data/CTW1500/'
+ctw_root_dir = './drive/MyDrive/data/CTW1500/'
 ctw_train_data_dir = ctw_root_dir + 'train/text_image/'
 ctw_train_gt_dir = ctw_root_dir + 'train/text_label_curve/'
 ctw_test_data_dir = ctw_root_dir + 'test/text_image/'
@@ -34,22 +34,36 @@ def get_ann(img, gt_path):
     h, w = img.shape[0:2]
     #lines = mmcv.list_from_file(gt_path) # replaced by python readlines
     with open(gt_path, "r") as file:
-        lines = file.readlines()
-    bboxes = []
-    words = []
-    for line in lines:
-        line = line.replace('\xef\xbb\xbf', '')
-        gt = line.split(',')
-        x1 = np.int(gt[0])
-        y1 = np.int(gt[1])
-        print(gt[4:32])
-        bbox = [np.int(gt[i]) for i in range(4, 32)]
-        bbox = np.asarray(bbox) + ([x1 * 1.0, y1 * 1.0] * 14)
-        bbox = np.asarray(bbox) / ([w * 1.0, h * 1.0] * 14)
+        try:
+            lines = file.readlines()
+        except:
+            lines=None
+            pass
+    if lines is not None:
+        bboxes = []
+        words = []
+        for line in lines:
+            line = line.replace('\xef\xbb\xbf', '')
+            gt = line.split(',')
 
-        bboxes.append(bbox)
-        words.append('???')
-    return bboxes, words
+            x1 = np.int(gt[0])
+            y1 = np.int(gt[1])
+            for i in range(4,32):
+                if gt[i]=='\n':
+                    gt[i]=0
+                else:
+                    pass
+            bbox = [np.int(gt[i]) for i in range(4, 32)]
+            bbox = np.asarray(bbox) + ([x1 * 1.0, y1 * 1.0] * 14)
+            bbox = np.asarray(bbox) / ([w * 1.0, h * 1.0] * 14)
+
+            bboxes.append(bbox)
+            words.append('???')
+        return bboxes, words
+    else:
+        bboxes=np.zeros(32,dtype=int).tolist()
+        words='???'
+        return bboxes,words
 
 
 def random_horizontal_flip(imgs):
@@ -249,7 +263,6 @@ class PAN_CTW(tf.keras.utils.Sequence):
 
         img = get_img(img_path)
         bboxes, words = get_ann(img, gt_path)
-
         if len(bboxes) > self.max_word_num:
             bboxes = bboxes[:self.max_word_num]
 
@@ -261,7 +274,7 @@ class PAN_CTW(tf.keras.utils.Sequence):
         if len(bboxes) > 0:
             for i in range(len(bboxes)):
                 bboxes[i] = np.reshape(bboxes[i] * ([img.shape[1], img.shape[0]] * (bboxes[i].shape[0] // 2)),
-                                       (bboxes[i].shape[0] // 2, 2)).astype('int32')
+                                       ((bboxes[i]).shape[0] // 2, 2)).astype('int32')
             for i in range(len(bboxes)):
                 cv2.drawContours(gt_instance, [bboxes[i]], -1, i + 1, -1)
                 if words[i] == '###':
