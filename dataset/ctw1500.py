@@ -22,48 +22,32 @@ def PolyArea(x,y):
     return 0.5*np.abs(np.dot(x,np.roll(y,1))-np.dot(y,np.roll(x,1)))
 
 def get_img(img_path):
-    try:
-        img = cv2.imread(img_path)
-        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)        
-    except Exception as e:
-        print(img_path)
-        raise
+    img = cv2.imread(img_path)
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)        
     return img
 
 def get_ann(img, gt_path):
     h, w = img.shape[0:2]
     #lines = mmcv.list_from_file(gt_path) # replaced by python readlines
     with open(gt_path, "r") as file:
-        try:
-            lines = file.readlines()
-        except:
-            lines=None
-            pass
-    if lines is not None:
-        bboxes = []
-        words = []
-        for line in lines:
-            line = line.replace('\xef\xbb\xbf', '')
-            gt = line.split(',')
+        lines = file.readlines()
+    bboxes = []
+    words = []
+    for line in lines:
+        line = line.replace('\xef\xbb\xbf', '')
+        gt = line.split(',')
 
-            x1 = np.int(gt[0])
-            y1 = np.int(gt[1])
-            for i in range(4,32):
-                if gt[i]=='\n':
-                    gt[i]=0
-                else:
-                    pass
-            bbox = [np.int(gt[i]) for i in range(4, 32)]
-            bbox = np.asarray(bbox) + ([x1 * 1.0, y1 * 1.0] * 14)
-            bbox = np.asarray(bbox) / ([w * 1.0, h * 1.0] * 14)
+        x1 = np.int(gt[0])
+        y1 = np.int(gt[1])
+            
+        bbox = [np.int(gt[i]) for i in range(4, 32)]
+        bbox = np.asarray(bbox) + ([x1 * 1.0, y1 * 1.0] * 14)
+        bbox = np.asarray(bbox) / ([w * 1.0, h * 1.0] * 14)
 
-            bboxes.append(bbox)
-            words.append('???')
-        return bboxes, words
-    else:
-        bboxes=np.zeros(32,dtype=int).tolist()
-        words='???'
-        return bboxes,words
+        bboxes.append(bbox)
+        words.append('???')
+    return bboxes, words
+   
 
 
 def random_horizontal_flip(imgs):
