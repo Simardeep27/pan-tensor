@@ -18,6 +18,9 @@ from models.pan import PAN
 from loss.loss import loss_tensor
 from utils.helper import adjust_learning_rate, upsample
 from utils.average_meter import AverageMeter
+from tensorflow.python.framework.convert_to_constants import convert_variables_to_constants_v2
+
+
 
 # main function:
 if __name__ == '__main__':
@@ -193,9 +196,8 @@ if __name__ == '__main__':
             # Save the weights
             model.save_weights('%s/model_epoch_%s' % (output_path, str(epoch)), overwrite=False)
             full_model = tf.function(lambda x: model(x))
-            print(model.inputs[0],model.inputs[0].shape)
             full_model = full_model.get_concrete_function(
-            tf.TensorSpec(model.inputs[0].shape, model.inputs[0].dtype))
+            tf.TensorSpec(shape=[None,None,None,3], dtype=tf.float32))
 
 # Get frozen ConcreteFunction
             frozen_func = convert_variables_to_constants_v2(full_model)
@@ -218,5 +220,4 @@ if __name__ == '__main__':
                   logdir="./frozen_models",
                   name="frozen_graph.pb",
                   as_text=False)
-
 
