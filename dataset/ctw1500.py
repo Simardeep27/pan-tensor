@@ -13,8 +13,8 @@ import pdb
 import matplotlib.pyplot as plt
 
 ctw_root_dir = '../input/ctw1500'
-ctw_train_data_dir = ctw_root_dir + '../input/ctw1500/train/text_image'
-ctw_train_gt_dir = ctw_root_dir + '../input/ctw1500/train/text_label_curve'
+ctw_train_data_dir = ctw_root_dir + '/train/text_image'
+ctw_train_gt_dir = ctw_root_dir + '/train/text_label_curve'
 ctw_test_data_dir = ctw_root_dir + 'test/text_image/'
 ctw_test_gt_dir = ctw_root_dir + 'test/text_label_circum/'
 
