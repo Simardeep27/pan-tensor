@@ -191,7 +191,7 @@ if __name__ == '__main__':
                 with open(os.path.join(output_path,'statistics.txt'), 'a') as f:
                     f.write("{} {} {} {} {} {}\n".format(losses_text.avg, losses_kernels.avg, losses_emb.avg, losses.avg, ious_text.avg, ious_kernel.avg))
 
-        if epoch % 100 == 0:
+        if epoch % 10 == 0:
             print("Save model......")
             # Save the weights
             model.save_weights('%s/model_epoch_%s' % (output_path, str(epoch)), overwrite=False)
